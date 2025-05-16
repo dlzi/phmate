@@ -12,7 +12,7 @@ optdepends=(
     'lsof: for better process and port management'
     'ss: alternative tool for port checking'
 )
-source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/$pkgver.tar.gz")
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
 sha256sums=('SKIP') # Replace 'SKIP' with the actual sha256 checksum
 
 package() {
