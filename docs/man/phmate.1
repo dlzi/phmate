@@ -1,0 +1,237 @@
+.\" Man page for PHPMate
+.\" Generated for PHPMate 1.0.0
+.TH PHMATE 1 "May 16, 2025" "PHPMate 1.0.0" "User Commands"
+.SH NAME
+phmate \- PHP Built-in Server Manager for local development
+.SH SYNOPSIS
+.B phmate
+.I COMMAND
+[
+.I OPTIONS
+]
+[
+.I HOSTNAME:PORT
+]
+.SH DESCRIPTION
+.B PHPMate
+is a lightweight command-line utility designed to simplify the management of PHP's built-in web server for local development. It provides an intuitive interface for starting, stopping, and configuring PHP's built-in web server with various options including document root and custom PHP router script files.
+.PP
+PHPMate requires PHP 8.0 or higher to be installed. Logging verbosity can be controlled by setting the
+.B LOG_LEVEL
+environment variable to one of DEBUG, INFO, WARNING, or ERROR (default: INFO). The
+.B \-\-debug
+option is a convenience that sets
+.B LOG_LEVEL=DEBUG
+for a single command.
+.SH COMMANDS
+.TP
+.B start
+.B phmate start
+[
+.I OPTIONS
+]
+[
+.I HOSTNAME:PORT
+]
+.br
+Start the PHP built-in web server (default: localhost:8000).
+.RS
+.TP
+.B \-\-docroot=PATH
+Set document root directory (default: current directory).
+.TP
+.B \-\-php=PATH
+Specify PHP binary
+.TP
+.B \-\-php-ini=PATH
+Specify custom PHP ini file.
+.TP
+.B \-\-profile=NAME
+Use specific configuration profile (default: default).
+.TP
+.B \-\-router=FILE
+Set custom PHP router script file (file path).
+.TP
+.B \-\-debug
+Enable debug logging (sets LOG_LEVEL=DEBUG).
+.RE
+.TP
+.B stop
+.B phmate stop
+[
+.I OPTIONS
+]
+.br
+Stop the running PHP server.
+.RS
+.TP
+.B \-\-profile=NAME
+Use specific configuration profile (default: default).
+.TP
+.B \-\-debug
+Enable debug logging (sets LOG_LEVEL=DEBUG).
+.RE
+.TP
+.B restart
+.B phmate restart
+[
+.I OPTIONS
+]
+[
+.I HOSTNAME:PORT
+]
+.br
+Restart the PHP server.
+.RS
+Options: Same as for the
+.B start
+command.
+.RE
+.TP
+.B status
+.B phmate status
+[
+.I OPTIONS
+]
+.br
+Show server status.
+.RS
+.TP
+.B \-\-profile=NAME
+Use specific configuration profile (default: default).
+.TP
+.B \-\-debug
+Enable debug logging (sets LOG_LEVEL=DEBUG).
+.RE
+.TP
+.B wizard
+.B phmate wizard
+[
+.I OPTIONS
+]
+.br
+Interactive setup to configure server settings. Prompts for saving the configuration and starting the server default to "yes" (Y).
+.RS
+.TP
+.B \-\-profile=NAME
+Use specific configuration profile (default: default).
+.TP
+.B \-\-debug
+Enable debug logging (sets LOG_LEVEL=DEBUG).
+.RE
+.TP
+.B config
+.B phmate config
+[
+.I OPTIONS
+]
+.br
+Show current configuration.
+.RS
+.TP
+.B \-\-profile=NAME
+Use specific configuration profile (default: default).
+.TP
+.B \-\-debug
+Enable debug logging (sets LOG_LEVEL=DEBUG).
+.RE
+.TP
+.B help
+.B phmate help
+.br
+Display the help information.
+.TP
+.B version
+.B phmate version
+.br
+Show version information.
+.SH EXAMPLES
+Start a server on the default port:
+.EX
+phmate start
+.EE
+Start a server on a specific port:
+.EX
+phmate start localhost:8080
+.EE
+Start a server with a custom document root:
+.EX
+phmate start \-\-docroot=/path/to/www
+.EE
+Start a server with a custom router script:
+.EX
+phmate start \-\-router=router.php
+.EE
+Start a server using a specific PHP version:
+.EX
+phmate start \-\-php=/usr/bin/php8.1
+.EE
+Start a server with a custom PHP ini file:
+.EX
+phmate start \-\-php-ini=/etc/php/8.1/php.ini
+.EE
+Use a named configuration profile:
+.EX
+phmate start \-\-profile=dev
+.EE
+Interactively configure the server:
+.EX
+phmate wizard
+.EE
+Check server status:
+.EX
+phmate status
+.EE
+Stop the server:
+.EX
+phmate stop
+.EE
+Show current configuration:
+.EX
+phmate config
+.EE
+Show version information:
+.EX
+phmate version
+.EE
+.SH FILES
+.TP
+.I ~/.config/phmate/config_PROFILE
+Configuration file for each profile. PROFILE is the profile name (default: default).
+.TP
+.I ~/.config/phmate/phmate.pid
+PID file for the running server.
+.TP
+.I ~/.config/phmate/phmate.log
+Log file for PHPMate operations and PHP server output.
+.SH EXIT STATUS
+.TP
+0
+Success
+.TP
+1
+Failure
+.TP
+2
+Invalid command-line option
+.SH ENVIRONMENT VARIABLES
+.TP
+.B PHMATE_CONFIG_DIR
+Override default configuration directory (~/.config/phmate).
+.TP
+.B LOG_LEVEL
+Set logging verbosity (DEBUG, INFO, WARNING, ERROR; default: INFO).
+.SH AUTHOR
+Daniel Zilli
+.SH SEE ALSO
+.BR php (1),
+.BR lsof (8),
+.BR ss (8)
+.PP
+The
+.B ss
+command is preferred for port checking, with
+.B lsof
+used as a fallback.
+.SH LICENSE
+MIT License
