@@ -1,0 +1,281 @@
+.\" Man page for PHPMate
+.\" Generated for PHPMate 1.1.0
+.TH PHMATE 1 "July 13, 2025" "PHPMate 1.1.0" "User Commands"
+.SH NAME
+phmate \- PHP Built-in Server Manager for local development
+.SH SYNOPSIS
+.B phmate
+.I COMMAND
+[
+.I OPTIONS
+]
+[
+.I HOSTNAME:PORT
+]
+.SH DESCRIPTION
+.B PHPMate
+is a lightweight command-line utility designed to simplify the management of PHP's built-in web server for local development. It provides an intuitive interface for starting, stopping, and configuring PHP's built-in web server with various options including document root and custom PHP router script files.
+.PP
+PHPMate requires PHP 8.0 or higher to be installed. Logging verbosity can be controlled by setting the
+.B LOG_LEVEL
+environment variable to one of DEBUG, INFO, WARNING, or ERROR (default: INFO). The
+.B \-\-debug
+option is a convenience that sets
+.B LOG_LEVEL=DEBUG
+for a single command.
+.PP
+PHPMate features automatic router script detection: if no explicit
+.B \-\-router
+option is provided, it will automatically look for and use a
+.B router.php
+file in the document root directory if one exists.
+.SH COMMANDS
+.TP
+.B start
+.B phmate start
+[
+.I OPTIONS
+]
+[
+.I HOSTNAME:PORT
+]
+.br
+Start the PHP built-in web server (default: localhost:8000).
+.RS
+.TP
+.B \-\-docroot=PATH
+Set document root directory (default: current directory).
+.TP
+.B \-\-php=PATH
+Specify PHP binary
+.TP
+.B \-\-php-ini=PATH
+Specify custom PHP ini file.
+.TP
+.B \-\-profile=NAME
+Use specific configuration profile (default: default).
+.TP
+.B \-\-router=FILE
+Set custom PHP router script file (file path). If not specified, PHPMate will automatically look for
+.B router.php
+in the document root directory.
+.TP
+.B \-\-debug
+Enable debug logging (sets LOG_LEVEL=DEBUG).
+.RE
+.TP
+.B stop
+.B phmate stop
+[
+.I OPTIONS
+]
+.br
+Stop the running PHP server.
+.RS
+.TP
+.B \-\-profile=NAME
+Use specific configuration profile (default: default).
+.TP
+.B \-\-debug
+Enable debug logging (sets LOG_LEVEL=DEBUG).
+.RE
+.TP
+.B restart
+.B phmate restart
+[
+.I OPTIONS
+]
+[
+.I HOSTNAME:PORT
+]
+.br
+Restart the PHP server.
+.RS
+Options: Same as for the
+.B start
+command.
+.RE
+.TP
+.B status
+.B phmate status
+[
+.I OPTIONS
+]
+.br
+Show server status.
+.RS
+.TP
+.B \-\-profile=NAME
+Use specific configuration profile (default: default).
+.TP
+.B \-\-debug
+Enable debug logging (sets LOG_LEVEL=DEBUG).
+.RE
+.TP
+.B wizard
+.B phmate wizard
+[
+.I OPTIONS
+]
+.br
+Interactive setup to configure server settings. Prompts for saving the configuration and starting the server default to "yes" (Y).
+.RS
+.TP
+.B \-\-profile=NAME
+Use specific configuration profile (default: default).
+.TP
+.B \-\-debug
+Enable debug logging (sets LOG_LEVEL=DEBUG).
+.RE
+.TP
+.B config
+.B phmate config
+[
+.I OPTIONS
+]
+.br
+Show current configuration.
+.RS
+.TP
+.B \-\-profile=NAME
+Use specific configuration profile (default: default).
+.TP
+.B \-\-debug
+Enable debug logging (sets LOG_LEVEL=DEBUG).
+.RE
+.TP
+.B help
+.B phmate help
+.br
+Display the help information.
+.TP
+.B version
+.B phmate version
+.br
+Show version information.
+.SH ROUTER SCRIPT AUTO-DETECTION
+PHPMate automatically detects and uses a
+.B router.php
+file in the document root directory if the following conditions are met:
+.PP
+.RS
+1. No explicit
+.B \-\-router
+option is provided
+.br
+2. A file named
+.B router.php
+exists in the document root directory
+.br
+3. The
+.B router.php
+file is readable
+.RE
+.PP
+The explicit
+.B \-\-router
+option always takes precedence over auto-detection. When a router script is auto-detected, PHPMate will log this information for transparency.
+.SH EXAMPLES
+Start a server on the default port:
+.EX
+phmate start
+.EE
+Start a server on a specific port:
+.EX
+phmate start localhost:8080
+.EE
+Start a server with a custom document root (auto-detects router.php):
+.EX
+phmate start \-\-docroot=/path/to/www
+.EE
+Start a server with an explicit router script:
+.EX
+phmate start \-\-router=custom_router.php
+.EE
+Start a server using a specific PHP version:
+.EX
+phmate start \-\-php=/usr/bin/php8.1
+.EE
+Start a server with a custom PHP ini file:
+.EX
+phmate start \-\-php-ini=/etc/php/8.1/php.ini
+.EE
+Use a named configuration profile:
+.EX
+phmate start \-\-profile=dev
+.EE
+Interactively configure the server:
+.EX
+phmate wizard
+.EE
+Check server status:
+.EX
+phmate status
+.EE
+Stop the server:
+.EX
+phmate stop
+.EE
+Show current configuration:
+.EX
+phmate config
+.EE
+Show version information:
+.EX
+phmate version
+.EE
+.SH ROUTER SCRIPT EXAMPLES
+A basic router script that serves static files directly and routes other requests to index.php:
+.EX
+<?php
+// router.php
+if (preg_match('/\\.(png|jpg|jpeg|gif|css|js)$/', $_SERVER["REQUEST_URI"])) {
+    return false; // Serve the file as-is
+} else {
+    include_once 'index.php'; // Route to main application
+}
+.EE
+.SH FILES
+.TP
+.I ~/.config/phmate/config_PROFILE
+Configuration file for each profile. PROFILE is the profile name (default: default).
+.TP
+.I ~/.config/phmate/phmate.pid
+PID file for the running server.
+.TP
+.I ~/.config/phmate/phmate.log
+Log file for PHPMate operations and PHP server output.
+.TP
+.I router.php
+Auto-detected router script file in the document root directory.
+.SH EXIT STATUS
+.TP
+0
+Success
+.TP
+1
+Failure
+.TP
+2
+Invalid command-line option
+.SH ENVIRONMENT VARIABLES
+.TP
+.B PHMATE_CONFIG_DIR
+Override default configuration directory (~/.config/phmate).
+.TP
+.B LOG_LEVEL
+Set logging verbosity (DEBUG, INFO, WARNING, ERROR; default: INFO).
+.SH AUTHOR
+Daniel Zilli
+.SH SEE ALSO
+.BR php (1),
+.BR lsof (8),
+.BR ss (8)
+.PP
+The
+.B ss
+command is preferred for port checking, with
+.B lsof
+used as a fallback.
+.SH LICENSE
+MIT License

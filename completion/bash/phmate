@@ -1,0 +1,122 @@
+#!/bin/bash
+################################################################################
+# PHMate Bash Completion Script                                                #
+# Provides tab completion for PHMate commands, options, and custom router      #
+# script files                                                                #
+################################################################################
+
+_phmate_completion() {
+    local cur prev words cword
+    _init_completion || return
+
+    # PHMate config directory
+    local CONFIG_DIR="${PHMATE_CONFIG_DIR:-${HOME}/.config/phmate}"
+
+    # Main commands
+    local commands="start stop restart status wizard config help version"
+
+    # Options for various commands
+    local start_opts="--docroot --php --php-ini --profile --router --debug"
+    local stop_opts="--profile --debug"
+    local restart_opts="--docroot --php --php-ini --profile --router --debug"
+    local status_opts="--profile --debug"
+    local wizard_opts="--profile --debug"
+    local config_opts="--profile --debug"
+
+    # Helper function to get profiles
+    _get_profiles() {
+        if [[ -d "$CONFIG_DIR" ]]; then
+            find "$CONFIG_DIR" -type f -name "config_*" -print0 2> /dev/null | while IFS= read -r -d $'\0' cfg_file; do
+                basename "$cfg_file" | sed 's/^config_//'
+            done | sort -u
+        fi
+    }
+
+    # First level: Main commands
+    if [[ "$cword" -eq 1 ]]; then
+        COMPREPLY=($(compgen -W "$commands" -- "$cur"))
+        return
+    fi
+
+    # Handle command-specific options
+    local command="${words[1]}"
+
+    case "$command" in
+        start)
+            # Handle hostname:port format
+            if [[ "$prev" == "start" && "$cur" =~ ^[a-zA-Z0-9.-]*:[0-9]*$ ]]; then
+                # Don't interfere with hostname:port input
+                return
+            elif [[ "$prev" == "--docroot" ]]; then
+                COMPREPLY=($(compgen -d -- "$cur"))
+            elif [[ "$prev" == "--php" ]]; then
+                COMPREPLY=($(compgen -c -- "$cur" | grep -E '^php[0-9]*(\.[0-9]+)?$'))
+            elif [[ "$prev" == "--php-ini" ]]; then
+                COMPREPLY=($(compgen -f -- "$cur"))
+            elif [[ "$prev" == "--profile" ]]; then
+                COMPREPLY=($(compgen -W "$(_get_profiles)" -- "$cur"))
+            elif [[ "$prev" == "--router" ]]; then
+                COMPREPLY+=($(compgen -f -- "$cur"))
+            else
+                COMPREPLY=($(compgen -W "$start_opts" -- "$cur"))
+            fi
+            ;;
+
+        stop)
+            if [[ "$prev" == "--profile" ]]; then
+                COMPREPLY=($(compgen -W "$(_get_profiles)" -- "$cur"))
+            else
+                COMPREPLY=($(compgen -W "$stop_opts" -- "$cur"))
+            fi
+            ;;
+
+        restart)
+            if [[ "$prev" == "--docroot" ]]; then
+                COMPREPLY=($(compgen -d -- "$cur"))
+            elif [[ "$prev" == "--php" ]]; then
+                COMPREPLY=($(compgen -c -- "$cur" | grep -E '^php[0-9]*(\.[0-9]+)?$'))
+            elif [[ "$prev" == "--php-ini" ]]; then
+                COMPREPLY=($(compgen -f -- "$cur"))
+            elif [[ "$prev" == "--profile" ]]; then
+                COMPREPLY=($(compgen -W "$(_get_profiles)" -- "$cur"))
+            elif [[ "$prev" == "--router" ]]; then
+                COMPREPLY+=($(compgen -f -- "$cur"))
+            else
+                COMPREPLY=($(compgen -W "$restart_opts" -- "$cur"))
+            fi
+            ;;
+
+        status)
+            if [[ "$prev" == "--profile" ]]; then
+                COMPREPLY=($(compgen -W "$(_get_profiles)" -- "$cur"))
+            else
+                COMPREPLY=($(compgen -W "$status_opts" -- "$cur"))
+            fi
+            ;;
+
+        wizard)
+            if [[ "$prev" == "--profile" ]]; then
+                COMPREPLY=($(compgen -W "$(_get_profiles)" -- "$cur"))
+            else
+                COMPREPLY=($(compgen -W "$wizard_opts" -- "$cur"))
+            fi
+            ;;
+
+        config)
+            if [[ "$prev" == "--profile" ]]; then
+                COMPREPLY=($(compgen -W "$(_get_profiles)" -- "$cur"))
+            else
+                COMPREPLY=($(compgen -W "$config_opts" -- "$cur"))
+            fi
+            ;;
+
+        help | version)
+            COMPREPLY=()
+            ;;
+    esac
+
+    return 0
+}
+
+# Register the completion function for the 'phmate' command
+complete -F _phmate_completion phmate
